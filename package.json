@@ -1,13 +1,15 @@
 {
   "name": "mutation-test-scope-planner",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Choose mutation test scope from risk and changed behavior.",
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "test": "node --test"
+    "lint": "node --check bin/mutation-test-scope-planner.mjs && node --check src/index.mjs",
+    "test": "node --test",
+    "check": "npm run lint && npm test"
   },
   "license": "MIT",
   "repository": {
