@@ -12,6 +12,12 @@ const run=(root,file='evidence.json')=>spawnSync(process.execPath,['bin/mutation
 test('changed public branch includes its direct and dependent tests without a score',()=>{
   const r=planScope(evidence(),{now:()=>0});assert.equal(TOOL_ID,'mutation-test-scope-planner');assert.equal(r.status,'pass');assert.deepEqual(r.plan,[{target:'/functions/0',risk:'high',tests:['/tests/0','/tests/1'],estimatedMutants:4,estimatedSeconds:12}]);assert.equal(r.summary.checked,1);assert.equal('mutationScore' in r,false);assert.doesNotMatch(JSON.stringify(r),/branch-test|wrapper-test/);
 });
+test('opaque path-like identities compare exactly through the 128-unit bound without rendering',()=>{
+  const d=evidence(),identity='src/foo.mjs:branch';d.functions[0].id=identity;d.dependencies[0].callee=identity;d.tests[0].covers=[identity];
+  let r=planScope(d,{now:()=>0});assert.equal(r.status,'pass');assert.doesNotMatch(JSON.stringify(r),/src\/foo|branch-test/);
+  const exact='x'.repeat(128);d.functions[0].id=exact;d.dependencies[0].callee=exact;d.tests[0].covers=[exact];assert.equal(planScope(d,{now:()=>0}).status,'pass');
+  const over=exact+'x';d.functions[0].id=over;d.dependencies[0].callee=over;d.tests[0].covers=[over];r=planScope(d,{now:()=>0});assert.equal(r.status,'incomplete');assert.ok(r.findings.some(x=>x.ruleId==='input-invalid'));
+});
 test('dynamic or unsupported path is incomplete, not a guessed score',()=>{
   const d=evidence();d.dependencies[0].kind='dynamic';let r=planScope(d,{now:()=>0});assert.equal(r.status,'incomplete');assert.ok(r.findings.some(x=>x.ruleId==='dependency-unsupported'));assert.deepEqual(r.plan,[]);
   d.dependencies[0].kind='reflection';r=planScope(d,{now:()=>0});assert.equal(r.status,'incomplete');assert.ok(r.findings.some(x=>x.ruleId==='dependency-unsupported'));
