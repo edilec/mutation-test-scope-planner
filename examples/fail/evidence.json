@@ -1,0 +1,1 @@
+{"schemaVersion":"1","complete":{"changes":true,"dependencies":true,"coverage":true},"secondsPerMutant":3,"functions":[{"id":"branch","public":true,"changed":true,"mutants":4}],"dependencies":[],"tests":[{"id":"unrelated-test","covers":[]}]}
